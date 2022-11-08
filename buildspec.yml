@@ -11,7 +11,7 @@ phases:
   post_build:
     commands:
       - docker push 602192780151.dkr.ecr.ap-south-1.amazonaws.com/ecs-package-repository
-      - printf '[{"name":"test","imageUri":"%s"}]' 602192780151.dkr.ecr.ap-south-1.amazonaws.com/ecs-package-repository > imagedefinitions.json
+      - printf '[{"name":"ecs-package-sample-app","imageUri":"%s"}]' 602192780151.dkr.ecr.ap-south-1.amazonaws.com/ecs-package-repository > imagedefinitions.json
       - ls -altr
       - cat imagedefinitions.json
 artifacts:
