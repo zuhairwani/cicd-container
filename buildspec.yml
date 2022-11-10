@@ -1,40 +1,13 @@
 version: 0.24
-
-environment_variables:
-  plaintext:
-    CHILD_TEMPLATES: |
-      base_infra_3.yml
-    TEMPLATE_FILES: |
-      ecs-package_1.yml
       
 phases:
-  install:
-    commands:
-      npm install jsonlint -g
   pre_build:
     commands:
       - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 602192780151.dkr.ecr.ap-south-1.amazonaws.com
-      - echo "Validating CFN templates"
-      - |
-        for cfn_template in $TEMPLATE_FILES; do
-          echo "Validating CloudFormation template file $cfn_template"
-          aws cloudformation validate-template --template-body file://$cfn_template
-        done
   build:
     commands:
       - docker build -t youtube:latest .
       - docker tag youtube:latest 602192780151.dkr.ecr.ap-south-1.amazonaws.com/ecs-package-repository
-      - echo "Copying child stack templates to S3"
-      - |
-        for child_template in $CHILD_TEMPLATES; do
-          if [ "X$TEMPLATE_PREFIX" = "X" ]; then
-            aws s3 cp "$child_template" "s3://ecs-test-132/$child_template"
-          else
-            aws s3 cp "$child_template" "s3://ecs-test-132/$TEMPLATE_PREFIX/$child_template"
-          fi
-        done
-      - echo "Updating template configurtion files to use the appropriate values"
-      - |
   post_build:
     commands:
       - docker push 602192780151.dkr.ecr.ap-south-1.amazonaws.com/ecs-package-repository
